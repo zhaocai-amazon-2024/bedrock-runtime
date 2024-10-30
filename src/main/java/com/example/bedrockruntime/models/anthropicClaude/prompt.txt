@@ -88,18 +88,14 @@ It is simplified, so that crest and roots for full threads are shown sharp, with
 Alternative representation should be used only for enlarged detail and other special applications.
 </Screw thread representa­tion>
 
-**Respond in valid XML format with the tags as "detail", "probability","number"**. 
-    Here is one sample:
-    <detail>
-    这张图片是一个工程制图
-    <\detail>
-    <probability>
-    100
-    <\probability>
-    <number>
-    1
-    <\number>
-    <list>
-    2x M3x0.5 x 5
-    <\list>
-    请用中文回答
+**Respond in valid JSON format with the field as "detail", "probability","number", "list"**. 
+Here is one sample:
+    {    
+        
+        "detail": "这张图片是一个工程制图",
+        "chain_of_thought": "how you figure out the number and probability"
+        "probability": 100,
+        "number": 1,
+        "list": "2x M3x0.5 x 5"
+    }
+请用中文回答
