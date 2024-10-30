@@ -179,11 +179,15 @@ public class Converse {
             // 创建Bedrock运行时客户端
             client = BedrockRuntimeClient.builder()
                     .credentialsProvider(DefaultCredentialsProvider.create())
-                    .region(Region.US_WEST_2)
+                    .region(Region.EU_CENTRAL_1)
                     .build();
 
-            // 设置模型ID和参数
-            String modelId = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
+            // 设置模型ID和参
+            //us.anthropic.claude-3-5-sonnet-20241022-v2:0
+            //US_WEST_2
+            //eu.anthropic.claude-3-5-sonnet-20240620-v1:0
+            // EU_CENTRAL_1
+            String modelId = "eu.anthropic.claude-3-5-sonnet-20240620-v1:0";
             String inputText = readFile(promptPath);
             String base64Image = imageToBase64(imagePath);
             String fileType = getImageFileType(imagePath);
