@@ -270,19 +270,25 @@ public class Converse {
                 if (element == null) {
                     System.out.println(String.format("字段 '%s' 不存在", fieldName));
                 }
-                
                 // 返回格式化的结果
                 System.out.println(String.format("字段名: %s\n值: %s", fieldName, element.toString()));
-                
+                int num = element.getAsInt();
+                if(num > 0) {
+                    System.out.println(String.format("设计图纸: %s 是螺纹图纸", imagePath));
+                } else {
+                   System.out.println(String.format("设计图纸: %s 不是是螺纹图纸", imagePath));
+
+                }
+
             } catch (Exception e) {
                 System.out.println(String.format("获取字段 '%s' 时发生错误: %s", fieldName, e.getMessage()));
             }
-            System.out.println("number:");
-            System.out.println(jsonObject);
+            // System.out.println("number:");
+            // System.out.println(jsonObject);
 
-            String formattedJson = gson.toJson(jsonObject);
-            System.out.println("Json Formate:");
-            System.out.println(formattedJson);
+            // String formattedJson = gson.toJson(jsonObject);
+            // System.out.println("Json Formate:");
+            // System.out.println(formattedJson);
 
 
         } catch (FileNotFoundException e) {
