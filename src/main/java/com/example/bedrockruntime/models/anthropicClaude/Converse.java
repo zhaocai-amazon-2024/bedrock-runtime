@@ -3,6 +3,10 @@
 
 package com.example.bedrockruntime.models.anthropicClaude;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 // snippet-start:[bedrock-runtime.java2.Converse_AnthropicClaude]
 // Use the Converse API to send a text message to Anthropic Claude.
 
@@ -17,6 +21,23 @@ import software.amazon.awssdk.services.bedrockruntime.model.Message;
 
 public class Converse {
 
+
+    public static String readFile(String filePath) {
+        StringBuilder content = new StringBuilder();
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return null; // or throw an exception based on your error handling strategy
+        }
+        
+        return content.toString();
+    }
+    
     public static String converse() {
 
         // Create a Bedrock Runtime client in the AWS Region you want to use.
@@ -30,7 +51,7 @@ public class Converse {
         String modelId = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
 
         // Create the input text and embed it in a message object with the user role.
-        String inputText = "Tell me a short story about a robot.";
+        String inputText = readFile("/home/ec2-user/bedrock-runtime/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt");
         Message message = Message.builder()
                 .content(ContentBlock.fromText(inputText))
                 .role(ConversationRole.USER)
