@@ -1,65 +1,112 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-
 package com.example.bedrockruntime.models.anthropicClaude;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
-// snippet-start:[bedrock-runtime.java2.Converse_AnthropicClaude]
-// Use the Converse API to send a text message to Anthropic Claude.
-
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
-import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
-import software.amazon.awssdk.services.bedrockruntime.model.ConversationRole;
-import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
-import software.amazon.awssdk.services.bedrockruntime.model.Message;
+import software.amazon.awssdk.services.bedrockruntime.model.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Base64;
 
 public class Converse {
+    private static String imageToBase64(String imagePath) throws IOException {
+        if (imagePath == null || imagePath.isEmpty()) {
+            throw new IllegalArgumentException("Image path cannot be null or empty");
+        }
 
+        File imageFile = new File(imagePath);
+        if (!imageFile.exists()) {
+            throw new FileNotFoundException("Image file not found: " + imagePath);
+        }
 
-    public static String readFile(String filePath) {
-        StringBuilder content = new StringBuilder();
+        try {
+            BufferedImage image = ImageIO.read(imageFile);
+            if (image == null) {
+                throw new IOException("Failed to read image: " + imagePath);
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            String format = imagePath.substring(imagePath.lastIndexOf(".") + 1);
+            
+            if (!ImageIO.write(image, format, outputStream)) {
+                throw new IOException("Failed to write image to output stream");
+            }
+            
+            return Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        } catch (SecurityException e) {
+            throw new IOException("Security error accessing image file: " + e.getMessage(), e);
+        }
+    }
+
+    private static String getImageFileType(String imagePath) {
+        if (imagePath == null || imagePath.isEmpty()) {
+            throw new IllegalArgumentException("Image path cannot be null or empty");
+        }
         
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+        String extension = imagePath.substring(imagePath.lastIndexOf(".") + 1).toLowerCase();
+        if (extension.isEmpty()) {
+            throw new IllegalArgumentException("Invalid image file extension");
+        }
+        
+        return extension;
+    }
+
+    public static String readFile(String filePath) throws IOException {
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("File path cannot be null or empty");
+        }
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new FileNotFoundException("File not found: " + filePath);
+        }
+
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 content.append(line).append("\n");
             }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            return null; // or throw an exception based on your error handling strategy
+            return content.toString();
+        } catch (SecurityException e) {
+            throw new IOException("Security error accessing file: " + e.getMessage(), e);
         }
-        
-        return content.toString();
     }
     
-    public static String converse() {
+    public static String converse(String imagePath, String promptPath) throws IOException {
+        if (imagePath == null || promptPath == null) {
+            throw new IllegalArgumentException("Image path and prompt path cannot be null");
+        }
 
-        // Create a Bedrock Runtime client in the AWS Region you want to use.
-        // Replace the DefaultCredentialsProvider with your preferred credentials provider.
-        BedrockRuntimeClient client = BedrockRuntimeClient.builder()
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .region(Region.US_WEST_2)
+        BedrockRuntimeClient client = null;
+        try {
+            client = BedrockRuntimeClient.builder()
+                    .credentialsProvider(DefaultCredentialsProvider.create())
+                    .region(Region.US_WEST_2)
+                    .build();
+
+            String modelId = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
+            String inputText = readFile(promptPath);
+            String base64Image = imageToBase64(imagePath);
+            String fileType = getImageFileType(imagePath);
+
+            ContentBlock imageContent = ContentBlock.builder()
+                .image(ImageBlock.builder()
+                    .format(fileType)
+                    .source(ImageSource.builder()
+                        .bytes(SdkBytes.fromByteArray(Base64.getDecoder().decode(base64Image)))
+                        .build())
+                    .build())
                 .build();
-
-        // Set the model ID, e.g., Claude 3 Haiku.
-        String modelId = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
-
-        // Create the input text and embed it in a message object with the user role.
-        String inputText = readFile("/home/ec2-user/bedrock-runtime/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt");
-        Message message = Message.builder()
-                .content(ContentBlock.fromText(inputText))
+                    
+            Message message = Message.builder()
+                .content(ContentBlock.fromText(inputText), imageContent)
                 .role(ConversationRole.USER)
                 .build();
 
-
-        try {
-            // Send the message with a basic inference configuration.
             ConverseResponse response = client.converse(request -> request
                     .modelId(modelId)
                     .messages(message)
@@ -68,20 +115,45 @@ public class Converse {
                             .temperature(0.5F)
                             .topP(0.9F)));
 
-            // Retrieve the generated text from Bedrock's response object.
-            String responseText = response.output().message().content().get(0).text();
-            System.out.println(responseText);
-
-            return responseText;
+            return response.output().message().content().get(0).text();
 
         } catch (SdkClientException e) {
-            System.err.printf("ERROR: Can't invoke '%s'. Reason: %s", modelId, e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("AWS SDK client error: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid argument: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error: " + e.getMessage(), e);
+        } finally {
+            if (client != null) {
+                client.close();
+            }
         }
     }
 
     public static void main(String[] args) {
-        converse();
+        try {
+            String promptPath = "/home/ec2-user/bedrock-runtime/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt";
+            String imagePath = "/home/ec2-user/bedrock-runtime/test.png";
+            
+            // Validate file paths
+            if (!new File(promptPath).exists()) {
+                throw new FileNotFoundException("Prompt file not found: " + promptPath);
+            }
+            if (!new File(imagePath).exists()) {
+                throw new FileNotFoundException("Image file not found: " + imagePath);
+            }
+
+            String response = converse(imagePath, promptPath);
+            System.out.println("Response from Claude:");
+            System.out.println(response);
+
+        } catch (FileNotFoundException e) {
+            System.err.println("File error: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("IO error: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
-// snippet-end:[bedrock-runtime.java2.Converse_AnthropicClaude]
