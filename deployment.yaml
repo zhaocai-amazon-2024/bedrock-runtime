@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bedrock-runtime
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bedrock-runtime
+  template:
+    metadata:
+      labels:
+        app: bedrock-runtime
+    spec:
+      serviceAccountName: bedrock-sa
+      containers:
+      - name: bedrock-runtime
+        image: 017820696633.dkr.ecr.us-west-2.amazonaws.com/bedrock-runtime:latest
+        env:
+        - name: AWS_REGION
+          value: "eu-central-1"
+        - name: AWS_DEFAULT_REGION
+          value: "eu-central-1"
+
