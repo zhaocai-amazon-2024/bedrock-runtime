@@ -242,8 +242,8 @@ public class Converse {
     public static void main(String[] args) {
         try {
             // 设置文件路径
-            String promptPath = "/home/ec2-user/bedrock-runtime-main/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt";
-            String imagePath = "/home/ec2-user/bedrock-runtime-main/test.png";
+            String promptPath = "/home/ec2-user/bedrock-runtime/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt";
+            String imagePath = "/home/ec2-user/bedrock-runtime/test.png";
             
             // 验证文件是否存在
             if (!new File(promptPath).exists()) {
