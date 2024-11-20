@@ -232,7 +232,7 @@ public class ConverseCrossAccount {
             // 创建Bedrock运行时客户端
             client = BedrockRuntimeClient.builder()
                     .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                    .region(Region.US_EAST_1)
+                    .region(Region.US_WEST_2 )
                     .build();
 
             // 设置模型ID和参
@@ -240,7 +240,7 @@ public class ConverseCrossAccount {
             //US_WEST_2
             //eu.anthropic.claude-3-5-sonnet-20240620-v1:0
             // EU_CENTRAL_1
-            String modelId = "anthropic.claude-3-5-sonnet-20240620-v1:0";
+            String modelId = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
             String inputText = readFile(promptPath);
             String base64Image = imageToBase64(imagePath);
             String fileType = getImageFileType(imagePath);
