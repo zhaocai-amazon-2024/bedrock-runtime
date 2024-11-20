@@ -30,6 +30,10 @@ COPY --from=builder /app/target/BedrockRuntime-1.0-SNAPSHOT.jar app.jar
 COPY src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt /app/data/
 COPY test.png /app/data/
 
+# 创建启动脚本 entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # 设置环境变量
 ENV AWS_REGION=eu-central-1
 ENV PROMPT_PATH=/app/data/prompt.txt
@@ -39,4 +43,4 @@ ENV IMAGE_PATH=/app/data/test.png
 # EXPOSE 8080
 
 # 设置容器启动命令
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

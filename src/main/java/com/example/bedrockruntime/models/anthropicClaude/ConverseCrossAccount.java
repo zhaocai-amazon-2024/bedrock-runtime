@@ -232,7 +232,7 @@ public class ConverseCrossAccount {
             // 创建Bedrock运行时客户端
             client = BedrockRuntimeClient.builder()
                     .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                    .region(Region.US_WEST_2 )
+                    .region(Region.US_WEST_2)
                     .build();
 
             // 设置模型ID和参
@@ -296,10 +296,10 @@ public class ConverseCrossAccount {
     public static void main(String[] args) {
         try {
             // 设置文件路径
-            // String promptPath = "/app/data/prompt.txt";
-            // String imagePath = "/app/data/test.png";
-            String promptPath = "/home/ec2-user/bedrock-runtime/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt";
-            String imagePath = "/home/ec2-user/bedrock-runtime/test.png";
+            String promptPath = "/app/data/prompt.txt";
+            String imagePath = "/app/data/test.png";
+            // String promptPath = "/home/ec2-user/bedrock-runtime/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt";
+            // String imagePath = "/home/ec2-user/bedrock-runtime/test.png";
             // 验证文件是否存在
             if (!new File(promptPath).exists()) {
                 throw new FileNotFoundException("Prompt file not found: " + promptPath);
