@@ -1,8 +1,6 @@
 package com.example.bedrockruntime.models.anthropicClaude;
 
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
@@ -214,26 +212,6 @@ public class ConverseCrossAccount {
         if (imagePath == null || promptPath == null) {
             throw new IllegalArgumentException("Image path and prompt path cannot be null");
         }
-        String secretName = "bedrock_ak_sk";
-        Region region = Region.of("us-west-2");
-        // String secrets = getSecret(secretName, region);
-
-        // Gson gson = new GsonBuilder()
-        // .disableHtmlEscaping()
-        // .setPrettyPrinting()
-        // .create();
-        // Object jsonObject = convertStringToJson(secrets);
-        // JsonObject json = gson.toJsonTree(jsonObject).getAsJsonObject();
-        // String skName = "aws_secret_access_key";
-        // String akName = "aws_access_key_id";
-        // JsonElement element_ak = json.get(akName);
-        // JsonElement element_sk = json.get(skName);
-        // System.out.println(String.format("aws_access_key_id: %s ", element_ak.toString()));
-        // System.out.println(String.format("aws_secret_access_key: %s ", element_sk.toString()));
-        // AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(
-        //     element_ak.toString(),     // 替换为您的访问密钥ID
-        //     element_sk.toString() // 替换为您的私有访问密钥
-        // );
         StsClient stsClient = StsClient.builder()
         .region(Region.US_EAST_1)
         .build();

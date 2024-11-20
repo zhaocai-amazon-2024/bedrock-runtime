@@ -179,7 +179,7 @@ public class Converse {
             // 创建Bedrock运行时客户端
             client = BedrockRuntimeClient.builder()
                     .credentialsProvider(DefaultCredentialsProvider.create())
-                    .region(Region.EU_CENTRAL_1)
+                    .region(Region.US_WEST_2)
                     .build();
 
             // 设置模型ID和参
@@ -187,7 +187,7 @@ public class Converse {
             //US_WEST_2
             //eu.anthropic.claude-3-5-sonnet-20240620-v1:0
             // EU_CENTRAL_1
-            String modelId = "eu.anthropic.claude-3-5-sonnet-20240620-v1:0";
+            String modelId = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
             String inputText = readFile(promptPath);
             String base64Image = imageToBase64(imagePath);
             String fileType = getImageFileType(imagePath);
@@ -242,8 +242,10 @@ public class Converse {
     public static void main(String[] args) {
         try {
             // 设置文件路径
-            String promptPath = "/app/data/prompt.txt";
-            String imagePath = "/app/data/test.png";
+            // String promptPath = "/app/data/prompt.txt";
+            // String imagePath = "/app/data/test.png";
+            String promptPath = "/home/ec2-user/bedrock-runtime/src/main/java/com/example/bedrockruntime/models/anthropicClaude/prompt.txt";
+            String imagePath = "/home/ec2-user/bedrock-runtime/test.png";
             
             // 验证文件是否存在
             if (!new File(promptPath).exists()) {
