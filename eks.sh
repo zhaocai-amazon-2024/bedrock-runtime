@@ -44,3 +44,8 @@ eksctl create iamserviceaccount \
 
 # # 查看详细日志
 # kubectl logs -l app=bedrock-runtime --tail=100 -f
+
+#kubectl describe pod bedrock-runtime-6dfdb879c8-7lslg
+
+#删除后会自动重启
+#kubectl delete pod bedrock-runtime-6dfdb879c8-9mpbl 
